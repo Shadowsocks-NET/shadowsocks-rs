@@ -39,11 +39,22 @@ members = [
     "crates/shadowsocks-service",
 ]
 
+[profile.dev]
+lto = 'thin'
+incremental = true
+
 [profile.release]
-lto = "fat"
+lto = true
+incremental = true
 codegen-units = 1
-incremental = false
-panic = "abort"
+
+[profile.release.build-override]
+opt-level = 3
+codegen-units = 1
+
+[profile.release.package."*"]
+opt-level = 3
+codegen-units = 1
 
 [features]
 default = [
@@ -51,11 +62,9 @@ default = [
     "trust-dns",
     "local",
     "server",
-    "manager",
     "utility",
     "local-http",
     "local-tunnel",
-    "local-socks4",
     "multi-threaded",
 ]
 
