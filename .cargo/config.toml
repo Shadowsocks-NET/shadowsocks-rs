@@ -8,7 +8,7 @@ rustflags = [
     # "--print", "native-static-libs",
 
     # Enable this for optimization for your local CPU
-    "-C", "target-cpu=native",
+    # "-C", "target-cpu=native",
 
     # Common ISA that is supported by modern CPUs
     # https://en.wikipedia.org/wiki/SSE4
@@ -30,7 +30,7 @@ rustflags = [
 
     # Common ISA that is supported by modern CPUs
     # https://en.wikipedia.org/wiki/SSSE3
-    "-C", "target-feature=+sse,+sse2,+sse3,+ssse3,+aes,+pclmulqdq",
+    "-C", "target-feature=+sse,+sse2,+sse3,+ssse3,+sse4.1,+sse4.2,+aes,+pclmulqdq",
 ]
 
 [target.'cfg(target_arch = "arm")']

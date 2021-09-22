@@ -15,19 +15,11 @@ jobs:
     strategy:
       matrix:
         target:
-          - i686-unknown-linux-musl
           - x86_64-pc-windows-gnu
           - x86_64-unknown-linux-gnu
           - x86_64-unknown-linux-musl
-          - arm-unknown-linux-gnueabi
-          - arm-unknown-linux-gnueabihf
-          - arm-unknown-linux-musleabi
-          - arm-unknown-linux-musleabihf
           - aarch64-unknown-linux-gnu
           - aarch64-unknown-linux-musl
-          - mips-unknown-linux-musl
-          - mips-unknown-linux-gnu
-          - mipsel-unknown-linux-musl
 
     steps:
       - uses: actions/checkout@v2
