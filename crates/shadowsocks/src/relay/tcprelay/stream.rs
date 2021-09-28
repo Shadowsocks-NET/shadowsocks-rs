@@ -13,10 +13,7 @@ use futures::ready;
 use log::trace;
 use tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 
-use crate::{
-    context::Context,
-    crypto::v1::{Cipher, CipherKind},
-};
+use crate::crypto::v1::{Cipher, CipherKind};
 
 enum DecryptReadState {
     WaitIv { key: Bytes },
@@ -56,7 +53,6 @@ impl DecryptedReader {
     pub fn poll_read_decrypted<S>(
         &mut self,
         cx: &mut task::Context<'_>,
-        context: &Context,
         stream: &mut S,
         buf: &mut ReadBuf<'_>,
     ) -> Poll<io::Result<()>>
@@ -67,7 +63,7 @@ impl DecryptedReader {
             match self.state {
                 DecryptReadState::WaitIv { ref key } => {
                     let key = unsafe { &*(key.as_ref() as *const _) };
-                    ready!(self.poll_read_iv(cx, context, stream, key))?;
+                    ready!(self.poll_read_iv(cx, stream, key))?;
 
                     self.buffer.clear();
                     self.buffer.truncate(0);
@@ -94,13 +90,7 @@ impl DecryptedReader {
         }
     }
 
-    fn poll_read_iv<S>(
-        &mut self,
-        cx: &mut task::Context<'_>,
-        context: &Context,
-        stream: &mut S,
-        key: &[u8],
-    ) -> Poll<io::Result<()>>
+    fn poll_read_iv<S>(&mut self, cx: &mut task::Context<'_>, stream: &mut S, key: &[u8]) -> Poll<io::Result<()>>
     where
         S: AsyncRead + Unpin + ?Sized,
     {
@@ -112,15 +102,6 @@ impl DecryptedReader {
         }
 
         let iv = &self.buffer[..iv_len];
-        if context.check_nonce_and_set(&iv) {
-            use std::io::Error;
-
-            trace!("detected repeated stream iv {:?}", ByteStr::new(&iv));
-
-            let err = Error::new(ErrorKind::Other, "detected repeated iv");
-            return Err(err).into();
-        }
-
         trace!("got stream iv {:?}", ByteStr::new(iv));
 
         let cipher = Cipher::new(self.method, key, iv);
